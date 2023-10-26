@@ -1,0 +1,10 @@
+# this docker file will copy the model inside it at the time of building the container
+FROM nvcr.io/nvidia/pytorch:22.12-py3
+USER root
+ENV PYTHONUNBUFFERED=TRUE
+RUN python3 -m pip install --upgrade pip
+RUN pip uninstall torch -y
+RUN pip install vllm
+RUN pip install --force-reinstall -v "pydantic==2.2.0"
+COPY ./Llama-2-7b-chat-hf ./models/Llama-2-7b-chat-hf
+CMD python -m vllm.entrypoints.openai.api_server --model models/Llama-2-7b-chat-hf --host 0.0.0.0 --port 32768 --max-num-batched-tokens 4096 --use-np-weights
